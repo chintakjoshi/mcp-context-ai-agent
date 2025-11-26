@@ -149,7 +149,7 @@ This will:
 ## Project Structure
 
 ```
-proactive-ai/
+mcp-context-ai-agent/
 ├── core-agent/                 # Main AI agent
 │   ├── src/
 │   │   ├── context_engine/     # Context processing and extraction
@@ -168,7 +168,7 @@ proactive-ai/
 │   ├── calendar/               # Calendar integration
 │   ├── notion/                 # Notion integration
 │   └── slack/                  # Slack integration
-├── frontend/                   # Web interface (optional)
+├── client/                   # Web interface (optional)
 ├── data/                       # Local data storage
 ├── config/                     # Credentials and config files
 ├── docker-compose.yml

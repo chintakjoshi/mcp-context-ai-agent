@@ -1,7 +1,12 @@
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional
 from datetime import datetime
 import asyncio
 import logging
+import sys
+import os
+
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+
 from .entities import ContextEntity, ContextType
 
 class ContextEngine:
@@ -35,6 +40,8 @@ class ContextEngine:
         elif source == "mock":
             # For testing
             entities.extend(await self._extract_mock_entities(data))
+        elif source == "demo":
+            entities.extend(await self._extract_calendar_entities(data.get('events', [])))
             
         return entities
     
@@ -82,8 +89,53 @@ class ContextEngine:
         if entity.type == ContextType.MEETING.value:
             self.logger.info(f"Meeting alert: {entity.content.get('title')}")
     
-    async def get_relevant_context(self, query: str, limit: int = 5) -> List[ContextEntity]:
+    async def get_relevant_context(self, query: str, limit: int = 5) -> List[Dict]:
         """Get relevant context for query"""
         results = await self.vector_db.similarity_search(query, limit)
-        # Convert back to entities (simplified)
         return results
+    
+    async def check_meeting_alerts(self) -> List[Dict]:
+        """Check for meeting alerts - simple version"""
+        alerts = []
+        
+        # Get upcoming meetings
+        upcoming = await self.get_relevant_context("meeting", 10)
+        
+        for item in upcoming:
+            metadata = item.get('metadata', {})
+            if metadata.get('type') == 'meeting':
+                content = metadata.get('content', {})
+                title = content.get('title', 'Unknown meeting')
+                
+                alert = {
+                    "type": "meeting_reminder", 
+                    "title": f"Upcoming: {title}",
+                    "message": "You have this meeting scheduled",
+                    "priority": "medium"
+                }
+                alerts.append(alert)
+        
+        return alerts
+
+    def _calculate_meeting_importance(self, event: Dict) -> float:
+        """Calculate importance of a meeting based on various factors"""
+        importance = 0.5  # Base importance
+        
+        # Factor 1: Number of attendees
+        attendees = event.get('attendees', [])
+        if len(attendees) > 5:
+            importance += 0.2
+        elif len(attendees) > 10:
+            importance += 0.3
+        
+        # Factor 2: Keywords in title
+        title = event.get('summary', '').lower()
+        important_keywords = ['review', 'important', 'urgent', 'executive', 'client']
+        if any(keyword in title for keyword in important_keywords):
+            importance += 0.2
+        
+        # Factor 3: Video conference
+        if event.get('hangoutLink'):
+            importance += 0.1
+        
+        return min(importance, 1.0)

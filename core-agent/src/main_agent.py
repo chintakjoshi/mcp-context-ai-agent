@@ -1,138 +1,94 @@
 import asyncio
-from typing import Dict, List
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime
 from context_engine.engine import ContextEngine
-from alert_system.triage import AlertTriage, Alert, AlertType, AlertPriority
 from memory.vector_store import VectorMemory
 
-class ProactiveAIAgent:
-    def __init__(self, config: Dict):
-        self.config = config
-        self.logger = logging.getLogger(__name__)
-        
-        # Initialize components
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+class SimpleProactiveAI:
+    def __init__(self):
         self.vector_memory = VectorMemory()
-        self.context_engine = ContextEngine(self.vector_memory, None)  # Add LLM client
-        self.alert_triage = AlertTriage()
-        
-        # MCP clients
-        self.mcp_clients: Dict[str, Any] = {}
-        
-        # State
+        self.context_engine = ContextEngine(self.vector_memory)
         self.is_running = False
     
     async def initialize(self):
-        """Initialize MCP connections and components"""
-        await self._initialize_mcp_clients()
-        await self._load_historical_context()
-        
-        self.logger.info("Proactive AI Agent initialized")
+        """Initialize the AI agent"""
+        logger.info("Initializing Proactive AI Agent...")
+        # Load any existing context
+        await self._load_initial_data()
+        logger.info("AI Agent initialized successfully!")
     
-    async def run_continuous_loop(self):
-        """Main agent loop"""
-        self.is_running = True
-        
-        while self.is_running:
-            try:
-                # Poll MCP servers for updates
-                await self._poll_data_sources()
-                
-                # Process any pending alerts
-                await self._process_pending_alerts()
-                
-                # Run periodic context analysis
-                await self._periodic_context_analysis()
-                
-                await asyncio.sleep(30)  # Poll every 30 seconds
-                
-            except Exception as e:
-                self.logger.error(f"Error in main loop: {e}")
-                await asyncio.sleep(60)  # Back off on error
+    async def _load_initial_data(self):
+        """Load initial mock data for testing"""
+        mock_data = {
+            "source": "mock",
+            "events": [
+                {
+                    "id": "1",
+                    "summary": "Meeting with Acme Corp",
+                    "start": {"dateTime": "2024-01-15T14:00:00Z"},
+                    "end": {"dateTime": "2024-01-15T15:00:00Z"}
+                }
+            ]
+        }
+        await self.context_engine.update_context("mock", mock_data)
     
-    async def _poll_data_sources(self):
-        """Poll all MCP servers for new data"""
-        polling_tasks = []
+    async def run_demo(self):
+        """Run a simple demo"""
+        logger.info("Starting demo...")
         
-        for source, client in self.mcp_clients.items():
-            task = asyncio.create_task(self._poll_single_source(source, client))
-            polling_tasks.append(task)
+        # Simulate receiving new data
+        new_meeting = {
+            "source": "mock",
+            "events": [
+                {
+                    "id": "2", 
+                    "summary": "Project Phoenix Kickoff",
+                    "start": {"dateTime": "2024-01-16T10:00:00Z"},
+                    "end": {"dateTime": "2024-01-16T11:00:00Z"}
+                }
+            ]
+        }
         
-        await asyncio.gather(*polling_tasks, return_exceptions=True)
-    
-    async def _poll_single_source(self, source: str, client):
-        """Poll a single data source"""
+        await self.context_engine.update_context("mock", new_meeting)
+        
+        # Search for relevant context
+        results = await self.context_engine.get_relevant_context("project meeting")
+        logger.info("Search results for 'project meeting':")
+        for result in results:
+            logger.info(f" - {result['document']}")
+        
+        # Keep running to simulate continuous operation
+        logger.info("AI Agent is running... Press Ctrl+C to stop.")
         try:
-            # Get updates since last poll
-            updates = await client.get_updates(since=self.last_poll_time)
-            
-            if updates:
-                await self.context_engine.update_context(source, updates)
-                self.logger.info(f"Processed {len(updates)} updates from {source}")
-                
-        except Exception as e:
-            self.logger.error(f"Error polling {source}: {e}")
+            while True:
+                await asyncio.sleep(10)
+                # Simulate periodic context updates
+                await self._simulate_data_update()
+        except KeyboardInterrupt:
+            logger.info("Shutting down...")
     
-    async def _process_pending_alerts(self):
-        """Process and deliver validated alerts"""
-        # This would integrate with your notification system
-        # For now, just log
-        pending_alerts = await self._generate_alerts()
+    async def _simulate_data_update(self):
+        """Simulate receiving new data periodically"""
+        # In a real implementation, this would poll MCP servers
+        logger.info("Simulating data update...")
         
-        for alert in pending_alerts:
-            if await self.alert_triage.evaluate_alert(alert):
-                await self._deliver_alert(alert)
-    
-    async def _generate_alerts(self) -> List[Alert]:
-        """Generate potential alerts based on current context"""
-        alerts = []
-        
-        # Meeting preparation alerts
-        alerts.extend(await self._check_meeting_prep())
-        
-        # Project consistency alerts
-        alerts.extend(await self._check_project_consistency())
-        
-        # Health and wellness alerts
-        alerts.extend(await self._check_wellness())
-        
-        return alerts
-    
-    async def _check_meeting_prep(self) -> List[Alert]:
-        """Generate meeting preparation alerts"""
-        alerts = []
-        
-        # Get upcoming meetings in next 2 hours
-        upcoming_meetings = await self._get_upcoming_meetings(hours_ahead=2)
-        
-        for meeting in upcoming_meetings:
-            # Check if user has relevant documents open/unsaved
-            # Check recent communications about this meeting
-            # Check if meeting requires preparation
-            
-            alert = Alert(
-                id=f"meeting_prep_{meeting['id']}",
-                type=AlertType.MEETING_REMINDER,
-                priority=AlertPriority.MEDIUM,
-                message=f"Meeting with {meeting['title']} in 30 minutes. You have unsaved documents related to this meeting.",
-                context=meeting,
-                confidence=0.8,
-                suggested_actions=["Open related documents", "Review meeting notes"]
-            )
-            alerts.append(alert)
-        
-        return alerts
-    
-    async def _deliver_alert(self, alert: Alert):
-        """Deliver alert to user (integrate with your frontend)"""
-        self.logger.info(f"ALERT: {alert.message}")
-        
-        # Here you would integrate with:
-        # - Desktop notifications
-        # - Mobile app push notifications  
-        # - Web interface
-        # - Email summary digests
-        
-        # For now, just print
-        print(f"\n🚨 PROACTIVE ALERT: {alert.message}")
-        print(f"   Suggested: {', '.join(alert.suggested_actions)}")
+        # Add some random test data occasionally
+        import random
+        if random.random() < 0.3:  # 30% chance
+            test_queries = ["urgent meeting", "project review", "team sync"]
+            query = random.choice(test_queries)
+            results = await self.context_engine.get_relevant_context(query, 2)
+            logger.info(f"Proactive insight for '{query}': Found {len(results)} relevant items")
+
+async def main():
+    """Main entry point"""
+    ai_agent = SimpleProactiveAI()
+    await ai_agent.initialize()
+    await ai_agent.run_demo()
+
+if __name__ == "__main__":
+    asyncio.run(main())

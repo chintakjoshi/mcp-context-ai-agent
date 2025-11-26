@@ -390,13 +390,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Uses ChromaDB for vector storage
 - Leverages sentence-transformers for embeddings
 
-## Contact
-
-For questions, suggestions, or collaboration:
-- Open an issue on GitHub
-- Email: your.email@example.com
-- Twitter: @yourhandle
-
 ---
 
 **Note**: This is an experimental project exploring the boundaries of proactive AI assistance. Always review and validate any actions suggested by the system before executing them.

@@ -2,7 +2,7 @@
 
 > A privacy-first AI agent that maintains persistent awareness of your digital life and proactively provides insights, warnings, and assistance without being asked.
 
-## 🌟 Overview
+## Overview
 
 This project reimagines the personal AI assistant paradigm. Instead of a reactive Q&A chatbot that forgets everything between sessions, this system creates a **continuous, privacy-respecting memory** of your goals, projects, and habits to act as a true digital partner.
 
@@ -23,7 +23,7 @@ A proactive AI agent that:
 - **Learns from feedback** to improve its usefulness over time
 - **Respects your privacy** with local-first, encrypted architecture
 
-## 🏗️ Architecture
+## Architecture
 
 ```
 ┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
@@ -51,7 +51,7 @@ A proactive AI agent that:
 4. **Alert Triage System**: ML-powered filter that learns what constitutes a useful intervention
 5. **Proactive Agent**: Orchestrates all components and delivers timely insights
 
-## ✨ Key Features
+## Key Features
 
 ### Proactive Interventions
 
@@ -83,7 +83,7 @@ I've blocked a 1-hour 'focus time' slot for you tomorrow afternoon."
 - **Smart Polling**: Adaptive polling intervals based on data source update patterns
 - **Semantic Context Matching**: Vector embeddings for cross-source relationship discovery
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -146,7 +146,7 @@ This will:
 - Test context extraction
 - Verify alert generation
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 proactive-ai/
@@ -214,7 +214,7 @@ Adjust alert thresholds in `config/alerts_config.json`:
 }
 ```
 
-## 🧠 How It Works
+## How It Works
 
 ### 1. Data Collection
 
@@ -263,7 +263,7 @@ Validated alerts are delivered via:
 - Mobile app (optional)
 - Daily digest emails
 
-## 🔒 Privacy & Security
+## Privacy & Security
 
 This project is designed with privacy as a core principle:
 
@@ -288,7 +288,7 @@ This project is designed with privacy as a core principle:
 - Automatic pruning of old context data
 - User-controlled data deletion
 
-## 🎯 Roadmap
+## Roadmap
 
 ### Phase 1: Foundation (Weeks 1-4)
 - [x] Project structure setup
@@ -315,7 +315,7 @@ This project is designed with privacy as a core principle:
 - [ ] Mobile app (optional)
 - [ ] Advanced personalization
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! This project is ambitious and benefits from diverse perspectives.
 
@@ -335,7 +335,7 @@ Contributions are welcome! This project is ambitious and benefits from diverse p
 5. Push: `git push origin feature/amazing-feature`
 6. Open a Pull Request
 
-## 📊 Performance Considerations
+## Performance Considerations
 
 ### Resource Usage
 - **Memory**: ~2-4GB for vector database and models
@@ -348,7 +348,7 @@ Contributions are welcome! This project is ambitious and benefits from diverse p
 - Implement incremental updates instead of full scans
 - Cache frequently accessed context entities
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
@@ -372,25 +372,25 @@ python core-agent/src/memory/rebuild_index.py
 - Provide more feedback to improve ML model
 - Check working hours configuration
 
-## 📚 Further Reading
+## Further Reading
 
 - [MCP Protocol Specification](https://spec.modelcontextprotocol.io/)
 - [ChromaDB Documentation](https://docs.trychroma.com/)
 - [Prompt Engineering for Context Management](https://docs.anthropic.com/claude/docs/prompt-engineering)
 - [Building Privacy-Preserving AI Systems](https://arxiv.org/abs/2103.00001)
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - Inspired by research in context-aware computing and proactive AI
 - Built on the Model Context Protocol (MCP)
 - Uses ChromaDB for vector storage
 - Leverages sentence-transformers for embeddings
 
-## 📧 Contact
+## Contact
 
 For questions, suggestions, or collaboration:
 - Open an issue on GitHub

@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  core-agent:
+    build: ./core-agent
+    volumes:
+      - ./data:/app/data
+      - ./config:/app/config
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - GMAIL_CREDENTIALS=/app/config/gmail_credentials.json
+    depends_on:
+      - chroma-db
+
+  chroma-db:
+    image: chromadb/chroma
+    ports:
+      - "8000:8000"
+    volumes:
+      - chroma_data:/chroma/chroma
+
+  mcp-gmail:
+    build: ./mcp-servers/gmail
+    volumes:
+      - ./config:/app/config
+  
+  mcp-calendar:
+    build: ./mcp-servers/calendar
+    volumes:
+      - ./config:/app/config
+
+volumes:
+  chroma_data:
